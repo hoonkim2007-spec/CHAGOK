@@ -104,6 +104,13 @@ body.splash .hero{border-color:transparent}
 .pick .rate .rbar{display:block;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:5px;max-width:260px}
 .pick .rate .rbar i{display:block;height:100%;background:#2E7D68}
 .pick .rate.mid .rbar i{background:#C9922E}.pick .rate.lo .rbar i{background:var(--muted)}
+
+/* 로고가 카드 폭을 넘지 않게: 카드 폭에 맞춰 줄이고, 모자라면 powered by를 아랫줄로 */
+.hero{container-type:inline-size}
+.logo-row{flex-wrap:wrap;row-gap:6px}
+.logo{font-size:min(clamp(1.9rem,8.4vw,3rem),15cqi)}
+body.splash .logo{font-size:min(4.4rem,15.5cqi)}
+body.splash .logo-row{flex-direction:column;align-items:center}
 </style>
 </head>
 <body class="splash">
