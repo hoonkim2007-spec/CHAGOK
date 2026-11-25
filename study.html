@@ -714,7 +714,7 @@ h1{letter-spacing:0}
 <script>
 // ---- subject data: "hist2a" = 중간 범위(주제 1~11, kept but hidden), "hist2b" = 나머지 단원. Flip DATA_ID to restore.
 const DATA_ID=(()=>{try{if(localStorage.getItem("sq-pack")==="mo10")localStorage.setItem("sq-pack","hist2b")}catch(e){}return "hist2b"})();   // 10모 칸은 시험이 끝나 닫음
-const MID=DATA_ID==="hist2a",MO10=DATA_ID==="mo10",ADATA=MID||MO10;   // mo10 = 10월 학력평가(한국사1 전체 + 중간 범위 주제 1~11)
+const MID=DATA_ID==="hist2a",MO10=DATA_ID==="mo10",ADATA=MID||MO10,JY2=!ADATA;   // JY2: 기말 범위 지엽   // mo10 = 10월 학력평가(한국사1 전체 + 중간 범위 주제 1~11)
 // ---- 한국사2 교과서 주제 12~30 (교과서 62~149쪽 본문 기준) ----
 const NEW_TOPICS={12:"8·15 광복을 맞이하다",13:"대한민국 정부를 수립하다",14:"식민지 잔재 청산을 위해 노력하다",15:"6·25 전쟁, 한국인의 삶을 파괴하다",16:"전후 복구를 위해 노력하다",17:"남과 북, 독재 체제를 구축하다",18:"4·19 혁명으로 민주주의가 확대되다",19:"5·16 군사 정변으로 민주주의가 후퇴하다",20:"유신 헌법을 선포하다",21:"민주주의를 향한 열망, 유신 독재를 무너뜨리다",22:"시민의 힘으로 민주주의를 쟁취하다",23:"중산층이 성장하다",24:"냉전 체제가 해체되다",25:"민주주의가 성숙하고 남북 관계가 진전되다",26:"외환 위기, 한국 사회를 바꾸다",27:"여야 정권이 교체되고 남북 관계가 변화하다",28:"시민운동과 인권 의식이 성장하다",29:"대중문화가 성장하고 삶의 모습이 다양해지다",30:"동아시아의 평화를 모색하다"};
 // 기말고사 범위: 주제 12~27, 단 24는 제외 (범위 밖 주제는 문제·카드에서 빠짐)
@@ -743,9 +743,11 @@ const NEW_R=[
 [1947,"여운형 암살, 제2차 미소 공동 위원회 결렬(좌우 합작 운동 중단)",["여운형"],13],
 [1947,"유엔 총회, 남북한 인구 비례에 따른 총선거 실시 결정",[],13],
 [1948,"「삼천만 동포에게 읍고함」 발표",["김구"],13],
+[1948,"유엔 소총회, ‘감시가 가능한 지역’(남한)에서 우선 총선거 실시 결의",[],13],
 [1948,"남북 협상(평양에서 외국 군대 철수·통일 정부 수립 결의)",["김구","김규식","김두봉"],13],
 [1948,"제주 4·3 사건(단독 정부 수립 반대 무장봉기)",[],13],
 [1948,"5·10 총선거(한반도 최초의 보통 선거), 제헌 국회 구성",[],13],
+[1948,"제헌 헌법 제정",[],13],
 [1948,"제헌 헌법 공포",[],13],
 [1948,"대한민국 정부 수립(대통령·부통령 선출)",["이승만","이시영"],13],
 [1948,"조선 민주주의 인민 공화국 수립(수상 선출)",["김일성"],13,1],
@@ -1144,9 +1146,11 @@ const NEW_D={
 "여운형 암살, 제2차 미소 공동 위원회 결렬(좌우 합작 운동 중단)":[5,0,"제2차 미소 공위 5월~10월"],
 "유엔 총회, 남북한 인구 비례에 따른 총선거 실시 결정":[11,0],
 "「삼천만 동포에게 읍고함」 발표":[2,0,"2월 (『서울신문』 2월 11일)"],
+"유엔 소총회, ‘감시가 가능한 지역’(남한)에서 우선 총선거 실시 결의":[2,26],
 "남북 협상(평양에서 외국 군대 철수·통일 정부 수립 결의)":[4,0],
 "제주 4·3 사건(단독 정부 수립 반대 무장봉기)":[4,3],
 "5·10 총선거(한반도 최초의 보통 선거), 제헌 국회 구성":[5,10],
+"제헌 헌법 제정":[7,12],
 "제헌 헌법 공포":[7,17],
 "대한민국 정부 수립(대통령·부통령 선출)":[8,15],
 "조선 민주주의 인민 공화국 수립(수상 선출)":[9,9],
@@ -1678,7 +1682,7 @@ if(!ADATA)EV.forEach(e=>{const x=NEW_D[e.t];if(x){e.m=x[0];e.d=x[1]||0;e.dl=x[2]
 const ALLPEOPLE=[...new Set(EV.flatMap(e=>e.p))];
 const YMIN=MID?1906:Math.min(...EV.map(e=>e.y)),YMAX=MID?1945:Math.max(...EV.map(e=>e.y));
 const PERIODS=MO10?[{k:"all",l:"전체"},{k:"an",l:"선사~남북국",f:e=>e.y<918},{k:"gr",l:"고려",f:e=>e.y>=918&&e.y<1392},{k:"js",l:"조선",f:e=>e.y>=1392&&e.y<1863},{k:"gh",l:"개항기~대한 제국",f:e=>e.y>=1863&&e.y<1910},{k:"il",l:"일제 강점기",f:e=>e.y>=1910}]:!MID?[{k:"all",l:"전체"},{k:"40",l:"1945~50년대",f:e=>e.y<1960},{k:"60",l:"1960~70년대",f:e=>e.y>=1960&&e.y<1980},{k:"80a",l:"1980~1987",f:e=>e.y>=1980&&e.y<1988},{k:"88",l:"1988~현재",f:e=>e.y>=1988}]:[{k:"all",l:"전체"},{k:"10",l:"1910년대",f:e=>e.y<1920},{k:"20",l:"1920년대",f:e=>e.y>=1920&&e.y<1930},{k:"30",l:"1930~1945",f:e=>e.y>=1930}];
-const MODES=[{k:"mix",l:"섞어서"},{k:"year",l:"연도 맞히기"},{k:"event",l:"사건 고르기"},{k:"person",l:"인물 퀴즈"},{k:"order",l:"순서 배열"},{k:"source",l:"사료 퀴즈"},{k:"judge",l:"변형 문제"},{k:"jiyeop",l:"지엽"},{k:"exam",l:"라이트모의고사"}].filter(m=>MID||(m.k!=="jiyeop"&&m.k!=="exam"));
+const MODES=[{k:"mix",l:"섞어서"},{k:"year",l:"연도 맞히기"},{k:"event",l:"사건 고르기"},{k:"person",l:"인물 퀴즈"},{k:"order",l:"순서 배열"},{k:"source",l:"사료 퀴즈"},{k:"judge",l:"변형 문제"},{k:"jiyeop",l:"지엽"},{k:"exam",l:"라이트모의고사"}].filter(m=>MID||(m.k!=="exam"&&(m.k!=="jiyeop"||JY2)));
 if(MO10)MODES.splice(0,MODES.length,{k:"mix",l:"섞어서"},{k:"kw",l:"키워드로 찾기"},{k:"fact",l:"대표 사실 고르기"},{k:"person",l:"인물 퀴즈"},{k:"order",l:"순서 배열"},{k:"source",l:"사료 퀴즈"});
 // people with 3+ events in different years → "activity order" questions
 const eventsOf=(name,ev)=>ev.filter(e=>e.p.includes(name));
@@ -1713,7 +1717,7 @@ const P=id=>prog[id]||{box:0,wrong:0};
   if(!Array.isArray(settings.jyGroups))settings.jyGroups=settings.jyGroup&&settings.jyGroup!=="all"?[String(settings.jyGroup)]:[];
   if(!Array.isArray(settings.pm))settings.pm=settings.mode&&!["exam","practice","mix"].includes(settings.mode)?[settings.mode]:[];
   if(settings.mode!=="exam"&&settings.mode!=="final")settings.mode="practice";
-  if(!MID){settings.mode="practice";settings.pm=settings.pm.filter(k=>k!=="jiyeop"&&k!=="exam"&&MODES.some(m=>m.k===k));settings.jyGroups=[];
+  if(!MID){settings.mode="practice";settings.pm=settings.pm.filter(k=>(k!=="jiyeop"||JY2)&&k!=="exam"&&MODES.some(m=>m.k===k));if(!JY2)settings.jyGroups=[];
     settings.topics=settings.topics.filter(t=>TOPICS[t]);if(!PERIODS.some(x=>x.k===settings.period))settings.period="all"}
 })();
 const PM=()=>settings.pm.length?settings.pm:["mix"];
@@ -1787,6 +1791,9 @@ const JY_GROUPS=MID?[
  {g:7,l:"39쪽 사회적 차별에 맞선 운동",topic:8,base:1923},
  {g:8,l:"46쪽 물자와 인력 수탈 연도",topic:10,base:1938},
  {g:9,l:"주제 11 단체의 성립과 개편",topic:11,base:1938}
+]:JY2?[
+ {g:1,l:"65쪽 광복 직후 정치 세력(인물·정당)",topic:12,base:1945},
+ {g:2,l:"특별법·과거사 법 제정 연도",topic:13,base:2000}
 ]:[];
 // [group, kind, question, answer, distractors|null, explanation, year|null]
 const J=MID?[
@@ -2025,8 +2032,42 @@ const J=MID?[
 [9,"act","김원봉이 군무부장에 취임하면서 이룬 것은?","군대, 의회, 정부 모두에서 좌우 통합",["3부 통합","민족 유일당 결성","조선 독립 동맹과의 통합"],"1944년",1944],
 [9,"act","한국 광복군이 인도·미얀마 전선에 파견된 계기는?","영국군의 요청",["미군의 요청","소련군의 요청","중국 공산당의 요청"],"1943년",1943],
 [9,"seq","임시 정부의 이동 순서로 옳은 것은(교과서 지도 기준)?","상하이 → 항저우 → 창사 → 광저우 → 치장 → 충칭",["상하이 → 창사 → 항저우 → 광저우 → 충칭 → 치장","상하이 → 항저우 → 광저우 → 창사 → 치장 → 충칭","상하이 → 충칭 → 치장 → 광저우 → 창사 → 항저우"],"1919 → 1932 → 1937 → 1938 → 1939 → 1940",null]
+]:JY2?[
+// [group, kind, question, answer, distractors|null, explanation, year|null, topic(없으면 그룹 주제)]
+[1,"party","박헌영이 이끈 정당은?","남조선노동당(남로당)",null,"일제 강점기 조선 공산당 활동 · 사회주의 국가 건설 · 친일파 처벌 주장 (좌파)",null],
+[1,"party","여운형이 이끈 정당은?","조선 인민당",null,"조선 건국 준비 위원회 조직 · 민족이 주도하는 자율적 정부 수립 · 친일파 처벌 주장 (중도파)",null],
+[1,"party","김구가 이끈 정당은?","한국 독립당",null,"충칭 대한민국 임시 정부 주석 · 통일된 자주적 민주 국가 건설 · 친일파 처벌 주장",null],
+[1,"party","김성수가 이끈 정당은?","한국 민주당",null,"『동아일보』 사장 · 반소·반공 · 친일파 처벌에 미온적 (우파)",null],
+[1,"party","이승만이 이끈 단체는?","대한 독립 촉성 국민회",null,"임시 정부 초대 대통령(탄핵됨) · 민주주의 국가 건설·반공 · 친일파 처벌에 미온적 (우파)",null],
+[1,"leader","남조선노동당(남로당)을 이끈 인물은?","박헌영",null,"좌파로 분류돼요.",null],
+[1,"leader","조선 인민당을 이끈 인물은?","여운형",null,"중도파로 분류돼요.",null],
+[1,"leader","한국 독립당을 이끈 인물은?","김구",null,"충칭 임시 정부 주석이었어요.",null],
+[1,"leader","한국 민주당을 이끈 인물은?","김성수",null,"우파로 분류돼요.",null],
+[1,"leader","대한 독립 촉성 국민회를 이끈 인물은?","이승만",null,"우파로 분류돼요.",null],
+[1,"who","‘충칭 대한민국 임시 정부 주석, 통일된 자주적 민주 국가 건설 주장’에 해당하는 인물은?","김구",["김성수","이승만","여운형"],"한국 독립당",null],
+[1,"who","‘일제 강점기 사업가, 『동아일보』 사장, 반소·반공 주장’에 해당하는 인물은?","김성수",["이승만","김구","박헌영"],"한국 민주당",null],
+[1,"who","‘임시 정부 초대 대통령이었으나 탄핵됨, 민주주의 국가 건설·반공 주장’에 해당하는 인물은?","이승만",["김구","김성수","여운형"],"대한 독립 촉성 국민회",null],
+[1,"who","‘조선 건국 준비 위원회 조직, 민족이 주도하는 자율적 정부 수립 주장’에 해당하는 인물은?","여운형",["김구","박헌영","김규식"],"조선 인민당",null],
+[1,"who","‘일제 강점기 조선 공산당 활동, 사회주의 국가 건설 주장’에 해당하는 인물은?","박헌영",["여운형","김성수","김구"],"남조선노동당(남로당)",null],
+[1,"stance","65쪽 인물 중 친일파 처벌에 미온적이었던 두 사람은?","김성수, 이승만",["김구, 여운형","박헌영, 김구","여운형, 이승만"],"박헌영·여운형·김구는 친일파 처벌을 주장했어요.",null],
+[1,"stance","교과서가 중도파로 분류하지 않은 인물은?","김성수",["여운형","안재홍","김규식"],"중도파: 여운형, 안재홍, 김규식 / 우파: 김성수(한국 민주당), 이승만",null],
+[1,"stance","교과서가 좌파로 분류한 인물은?","박헌영",["김성수","이승만","김규식"],"사회주의자들은 좌파, 한국 민주당과 이승만은 우파예요.",null],
+[1,"stance","모스크바 3국 외상 회의 결정안을 둘러싼 대립에서 좌파와 같은 입장이었던 세력은?","중도파",["우파","한국 민주당","대한 독립 촉성 국민회"],"중도파는 필요하면 미군정과 협력하기도 했어요.",null],
+[2,"y","제주 4·3 사건 진상 규명 및 희생자 명예 회복에 관한 특별법이 제정된 해는?","2000",null,"제주도민들의 오랜 진상 규명 노력 끝에 제정. 이후 조사로 희생자는 약 3만 명.",2000,13],
+[2,"y","여수·순천 10·19 사건 진상 규명 및 희생자 명예 회복에 관한 특별법이 제정된 해는?","2021",null,"유가족과 시민 사회의 노력으로 제정. 사건 뒤 이승만 정부는 국가 보안법을 만들어 진상 규명을 막았어요.",2021,13],
+[2,"y","‘거창 사건 관련자 명예 회복에 관한 특별 조치법’이 제정된 해는?","1996",null,"1951년 국군이 민간인 719명을 학살한 사건. 5·16 뒤 유족회가 탄압받았어요.",1996,15],
+[2,"y","‘일제 강점하 반민족 행위 진상 규명에 관한 특별법’이 제정된 해는?","2004",null,"『대한민국 관보』 2004. 3. 22. 반민법(1948)과 목적을 비교하는 자료로 나와요.",2004,14],
+[2,"y","반민족 행위 처벌법(반민법)이 제정된 해는?","1948",null,"제헌 헌법 제101조에 근거해 제정. 반민 특위가 조사·기소했어요.",1948,14],
+[2,"y","5·18 특별법이 국회에서 제정된 해는?","1995",null,"1995년 12월. 노태우 비자금 폭로(10월) 뒤 제정되어 ‘성공한 쿠데타’도 처벌할 수 있게 되었어요.",1995,25],
+[2,"law","2000년에 제정된 특별법은?","제주 4·3 사건 특별법",null,"",2000,13],
+[2,"law","2021년에 제정된 특별법은?","여수·순천 10·19 사건 특별법",null,"",2021,13],
+[2,"law","1996년에 제정된 특별법은?","거창 사건 명예 회복 특별 조치법",null,"",1996,15],
+[2,"law","2004년에 제정된 특별법은?","일제 강점하 반민족 행위 진상 규명 특별법",null,"",2004,14],
+[2,"law","1995년 12월에 제정된 특별법은?","5·18 특별법",null,"",1995,25],
+[2,"seq","특별법이 제정된 순서로 옳은 것은?","5·18 특별법 → 거창 사건 → 제주 4·3 → 반민족 행위 진상 규명 → 여수·순천 10·19",["거창 사건 → 5·18 특별법 → 제주 4·3 → 반민족 행위 진상 규명 → 여수·순천 10·19","5·18 특별법 → 제주 4·3 → 거창 사건 → 반민족 행위 진상 규명 → 여수·순천 10·19","5·18 특별법 → 거창 사건 → 반민족 행위 진상 규명 → 제주 4·3 → 여수·순천 10·19"],"1995 → 1996 → 2000 → 2004 → 2021",null,13],
+[2,"cause","이승만 정부가 국가 보안법을 제정하는 계기가 된 사건은?","여수·순천 10·19 사건",["제주 4·3 사건","거창 사건","진보당 사건"],"1948년. 반공주의를 내세워 민간인 학살 진상 규명을 막았어요.",1948,13]
 ]:[];
-const JY=J.map(([g,k,q,a,d,ex,y])=>{const G=JY_GROUPS.find(x=>x.g===g);return {jy:true,id:"jy|"+q,g,k,q,a,d,ex,y,sy:y||G.base,topic:G.topic,t:q,p:[]}});
+const JY=J.map(([g,k,q,a,d,ex,y,tp])=>{const G=JY_GROUPS.find(x=>x.g===g);return {jy:true,id:"jy|"+q,g,k,q,a,d,ex,y,sy:y||G.base,topic:tp||G.topic,t:q,p:[]}});
 function jyByPeriod(){return JY.filter(inScope)}
 function exPool(){const l=EXQ.filter(inScope);return l.length?l:EXQ}
 function jyPool(){let l=topicOn()?JY.filter(x=>settings.topics.includes(String(x.topic))):JY;if(settings.jyGroups.length)l=l.filter(x=>settings.jyGroups.includes(String(x.g)));return l}
@@ -4203,7 +4244,7 @@ function renderStats(){
   });
   const judged=rows.filter(x=>x.r&&x.r.a>=MIN);
   const weakT=judged.length?judged.slice().sort((a,b)=>pct(a.r)-pct(b.r))[0]:rows.filter(x=>x.wrong).sort((a,b)=>b.wrong-a.wrong)[0];
-  const types=TYPE_LABEL.filter(([k])=>(MID||!["jiyeop","exam","final"].includes(k))&&(MO10?!["year","event","gen","write"].includes(k):!["kw","fact"].includes(k))).map(([k,l])=>({k,l,r:stats.type[k]}));
+  const types=TYPE_LABEL.filter(([k])=>(MID||(JY2&&k==="jiyeop")||!["jiyeop","exam","final"].includes(k))&&(MO10?!["year","event","gen","write"].includes(k):!["kw","fact"].includes(k))).map(([k,l])=>({k,l,r:stats.type[k]}));
   const jt=types.filter(x=>x.r&&x.r.a>=MIN);
   const weakY=jt.length?jt.slice().sort((a,b)=>pct(a.r)-pct(b.r))[0]:null;
   const totalA=types.reduce((a,x)=>a+(x.r?x.r.a:0),0);
@@ -4327,7 +4368,7 @@ function infoFor(q,o){
   // event objects: event, pWhat, order, pCareer
   const e=o;
   const same=EV.filter(x=>x.y===e.y&&x.id!==e.id);
-  let h=`<h3>${e.y}년</h3><p>${esc(e.t)}</p><p class="meta">${e.p.length?`관련 인물: ${esc(e.p.join(", "))} · `:""}주제 ${e.topic}. ${TOPICS[e.topic]}</p>`;
+  let h=`<h3>${e.y}년${e.dl?` <small style="font-weight:500">${esc(e.dl)}</small>`:""}</h3><p>${esc(e.t)}</p><p class="meta">${e.p.length?`관련 인물: ${esc(e.p.join(", "))} · `:""}주제 ${e.topic}. ${TOPICS[e.topic]}</p>`;
   e.p.forEach(n=>{const others=eventsOf(n,EV).filter(x=>x.id!==e.id);
     if(others.length)h+=`<p class="meta">${esc(n)}의 다른 활동</p><ul class="orderlist">${others.map(evLine).join("")}</ul>`});
   if(same.length)h+=`<p class="meta">같은 해의 다른 사건</p><ul class="orderlist">${same.slice(0,5).map(evLine).join("")}</ul>`;
@@ -4380,7 +4421,7 @@ function reveal(ok,T,q){
     const pos=q.opts.indexOf(q.ans);const lab=q.exam?CIRC[pos]:(pos+1)+"번";
     const st=$("stamp");st.textContent=ok?(q.exam?`+${q.pts}점`:"정답"):"오답";st.className="stamp name "+(ok?"ok":"bad");
     $("verdict").textContent=ok?`정답이에요. (${lab})`:`정답은 ${lab}이에요.`;
-    $("detail").innerHTML=`<p class="detail">${esc(q.ex)}<span class="meta">핵심 사건: ${T.y}년 ${esc(T.t)}${T.p.length?` — ${esc(T.p.join(", "))}`:""} · 주제 ${T.topic}</span><span class="meta">선지를 누르면 각 선지의 정보가 나와요.</span></p>`;
+    $("detail").innerHTML=`<p class="detail">${esc(q.ex)}<span class="meta">핵심 사건: ${T.y}년${T.dl?" "+esc(T.dl):""} ${esc(T.t)}${T.p.length?` — ${esc(T.p.join(", "))}`:""} · 주제 ${T.topic}</span><span class="meta">선지를 누르면 각 선지의 정보가 나와요.</span></p>`;
     $("reveal").classList.add("show");$("nextBtn").focus({preventScroll:true});
     $("reveal").scrollIntoView({behavior:"smooth",block:"nearest"});return;
   }
