@@ -1,0 +1,30 @@
+{
+ "name": "CHAGOK",
+ "short_name": "CHAGOK",
+ "description": "동탄국제고 공부와 자습 계획 — STUDY 암기 퀴즈와 PLAN 자습 시간표",
+ "lang": "ko",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#FFFFFF",
+ "theme_color": "#C8102E",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
