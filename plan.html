@@ -790,7 +790,7 @@ body{background-image:none!important}
    사용자 데이터(localStorage)는 STORE_KEY 아래에 따로 있어서
    파일을 새 버전으로 바꿔도 그대로 남는다.
    ========================================================= */
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.6.1";
 const SCHOOL_DATA = {
   version: "2026-02-25",
   source: "동탄국제고 홈페이지 ‘2026학년도 학사일정 안내’(2026. 2. 25. 게시)",
@@ -960,7 +960,10 @@ function schoolNow(){ const n=kstNow(); let m=n.getHours()*60+n.getMinutes(); le
 const useSess = x => !(x.kind==="morning" && !S.settings.useMorning) && !(x.kind==="late" && !S.settings.useLate);
 const diffDays = (a,b) => Math.round((parse(ymd(a)) - parse(ymd(b)))/86400000);
 const toMin = t => { const [h,m]=t.split(":").map(Number); return h*60+m; };
-const toHM = m => `${pad(Math.floor(m/60)%24)}:${pad(m%60)}`;   // 연등(24:00~25:30)은 00:00~01:30으로 보인다
+const toHM = m => `${pad(Math.floor(m/60)%24)}:${pad(m%60)}`;
+// 자정을 넘기는 시간(예: 23:00~01:00)은 저장할 때 24시를 넘겨 적는다 (연등 24:00~25:30과 같은 방식, 새벽 2시까지)
+const toHMx = m => `${pad(Math.floor(m/60))}:${pad(m%60)}`;
+const endAfter = (sm,em) => (em<=sm && em<=120) ? em+1440 : em;   // 연등(24:00~25:30)은 00:00~01:30으로 보인다
 const human = m => { if(m<=0) return "0분"; const h=Math.floor(m/60), r=m%60; return (h?h+"시간":"")+(h&&r?" ":"")+(r?r+"분":""); };
 const md = s => { const d=parse(s); return `${d.getMonth()+1}월 ${d.getDate()}일`; };
 const mdw = s => { const d=parse(s); return `${d.getMonth()+1}. ${d.getDate()}.(${WD[d.getDay()]})`; };
@@ -1389,7 +1392,7 @@ function renderAdded(){
   rows.sort((a,b)=>order.indexOf(a.wd)-order.indexOf(b.wd) || a.s.localeCompare(b.s));
   document.getElementById("addedList").innerHTML = rows.length ? `<div class="added"><b>내가 추가한 시간</b><ul>${rows.map(r=>{
     const dt=addDays(weekStart,(r.wd+6)%7);
-    return `<li><span>${WD[r.wd]}${r.kind==="once"?` ${dt.getMonth()+1}/${dt.getDate()}`:""}</span><span class="tm">${r.s}~${r.e}</span>
+    return `<li><span>${WD[r.wd]}${r.kind==="once"?` ${dt.getMonth()+1}/${dt.getDate()}`:""}</span><span class="tm">${toHM(toMin(r.s))}~${toMin(r.e)>=1440?"다음날 ":""}${toHM(toMin(r.e))}</span>
       <span class="lb">${esc(r.label||"")} ${human(toMin(r.e)-toMin(r.s))}<span class="kind ${r.kind==="once"?"once":""}">${r.kind==="once"?"이번 주만":"매주"}</span></span>
       <button type="button" class="rm" data-rmadded="${r.key}">삭제</button></li>`; }).join("")}</ul></div>` : "";
 }
@@ -1467,7 +1470,7 @@ function renderUndo(){
 }
 function updateSlotLen(){
   const a=document.getElementById("slotS").value, b=document.getElementById("slotE").value;
-  const n = a&&b ? toMin(b)-toMin(a) : 0;
+  const n = a&&b ? endAfter(toMin(a),toMin(b))-toMin(a) : 0;
   document.getElementById("slotLen").textContent = n>0 ? `= ${human(n)}` : "끝 시각을 시작보다 늦게 정해 주세요";
 }
 function afterSlotChange(msg){ markStale(); save(); renderSlots(); renderTasks(); renderSheet(); if(msg) toast(msg, undoStack.length?undoAct:null); }
@@ -2237,14 +2240,15 @@ function renderSessEditor(){
       <button class="btn ghost" data-addsess="${d}">시간대 추가</button></span></div>
       ${(S.settings.sessions[d]||[]).map((s,i)=>s.kind?"":`<div class="sess">
         <input type="text" value="${esc(s.label||"")}" data-sl="${d}:${i}" placeholder="이름" aria-label="시간대 이름">
-        <input type="time" value="${s.s}" step="600" data-ss="${d}:${i}" aria-label="시작">
-        ~ <input type="time" value="${s.e}" step="600" data-se="${d}:${i}" aria-label="끝">
+        <input type="time" value="${toHM(toMin(s.s))}" step="600" data-ss="${d}:${i}" aria-label="시작">
+        ~ <input type="time" value="${toHM(toMin(s.e))}" step="600" data-se="${d}:${i}" aria-label="끝">
         <span class="muted">${human(Math.max(0,toMin(s.e)-toMin(s.s)))}</span>
         <label class="muted"><input type="checkbox" data-sr="${d}:${i}" ${s.reserve?"checked":""}> 필요할 때만</label>
         <button class="x" data-rmsess="${d}:${i}">지우기</button></div>`).join("") || `<p class="muted">시간대가 없어요.</p>`}
     </div>`).join("");
   const upd=(sel,key)=>ed.querySelectorAll(sel).forEach(el=>el.onchange=()=>{ const [d,i]=el.dataset[key].split(":").map(Number); snap(`${WD[d]}요일 시간대 수정`);
-    const f = key==="sl"?"label":key==="ss"?"s":"e"; S.settings.sessions[d][i][f]=el.value; if(f!=="label") markStale(); save(); renderSessEditor(); refreshWeek(); });
+    const f = key==="sl"?"label":key==="ss"?"s":"e"; const it=S.settings.sessions[d][i]; it[f]=el.value;
+    if(f!=="label"){ const sm=toMin(it.s), em=endAfter(sm,toMin(it.e)%1440); it.e=toHMx(em); } if(f!=="label") markStale(); save(); renderSessEditor(); refreshWeek(); });
   upd("[data-sl]","sl"); upd("[data-ss]","ss"); upd("[data-se]","se");
   ed.querySelectorAll("[data-sr]").forEach(el=>el.onchange=()=>{ const [d,i]=el.dataset.sr.split(":").map(Number);
     snap(`${WD[d]}요일 ‘필요할 때만’ 변경`); S.settings.sessions[d][i].reserve = el.checked; markStale(); save(); refreshWeek(); });
@@ -2315,19 +2319,20 @@ document.getElementById("printBtn").onclick=()=>window.print();
 document.getElementById("slotS").onchange=updateSlotLen;
 document.getElementById("slotE").onchange=updateSlotLen;
 document.querySelectorAll("#addSlot [data-len]").forEach(b=>b.onclick=()=>{
-  const st=document.getElementById("slotS").value||"19:00"; const e=Math.min(toMin(st)+ +b.dataset.len, 24*60-10);
+  const st=document.getElementById("slotS").value||"19:00"; const e=Math.min(toMin(st)+ +b.dataset.len, 26*60);
   document.getElementById("slotE").value=toHM(e); updateSlotLen(); });
 document.getElementById("addSlot").onsubmit=e=>{
   e.preventDefault();
   const d=+document.getElementById("slotDay").value;
   let a=document.getElementById("slotS").value, b=document.getElementById("slotE").value;
   if(!a||!b){ toast("시작과 끝 시각을 적어 주세요."); return; }
-  const sm=Math.round(toMin(a)/UNIT)*UNIT, em=Math.round(toMin(b)/UNIT)*UNIT;
-  if(em-sm<UNIT){ toast("끝 시각이 시작보다 10분 이상 늦어야 해요."); return; }
+  const sm=Math.round(toMin(a)/UNIT)*UNIT, em=endAfter(sm, Math.round(toMin(b)/UNIT)*UNIT);
+  if(em-sm<UNIT){ toast("끝 시각이 시작보다 10분 이상 늦어야 해요. 자정을 넘기는 시간은 새벽 2시까지 넣을 수 있어요."); return; }
   const rep=document.querySelector('input[name="slotRep"]:checked').value;
-  const item={s:toHM(sm), e:toHM(em), label:document.getElementById("slotLabel").value.trim()};
+  const item={s:toHMx(sm), e:toHMx(em), label:document.getElementById("slotLabel").value.trim()};
   if(rep==="weekly") item.added=true;
-  snap(`${WD[d]}요일 ${item.s}~${item.e} 추가`);
+  const lab=`${toHM(sm)}~${em>=1440?"다음날 ":""}${toHM(em)}`;
+  snap(`${WD[d]}요일 ${lab} 추가`);
   if(rep==="weekly"){
     // 원래 자습 요일이 아니었다면 예전에 적어 둔 시간대는 비우고 새 시간만 넣는다
     const prevList = S.settings.days.includes(d) ? (S.settings.sessions[d]||[]) : [];
@@ -2338,7 +2343,7 @@ document.getElementById("addSlot").onsubmit=e=>{
   }
   document.getElementById("slotLabel").value="";
   document.querySelector('input[name="slotRep"][value="once"]').checked=true;
-  afterSlotChange(`${WD[d]}요일 ${item.s}~${item.e}을 ${rep==="weekly"?"매주":"이번 주에만"} 넣었어요.`);
+  afterSlotChange(`${WD[d]}요일 ${lab}을 ${rep==="weekly"?"매주":"이번 주에만"} 넣었어요.`);
 };
 document.getElementById("addedList").addEventListener("click",e=>{
   const t=e.target.closest("[data-rmadded]"); if(!t) return;
