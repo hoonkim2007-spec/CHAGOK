@@ -576,12 +576,18 @@ body{background-image:none!important}
 
 .bs-list input.bs-t{border:0;background:transparent;box-shadow:none;padding:6px 2px;flex:1;min-width:0}
 .bs-list input.bs-t:focus{background:#fff;outline:2px solid color-mix(in srgb,var(--c) 40%,transparent);border-radius:6px}
+
+/* 처음으로 바: 스크롤해도 위에 붙어 따라온다 */
+.homebar{position:sticky;top:0;z-index:70;background:var(--bg,#fff);box-shadow:0 2px 8px rgba(0,0,0,.06);border-bottom:1px solid var(--line,#e5e5e5);grid-column:1/-1}
+.homebar .homelink{display:flex;max-width:1280px;margin:0 auto;padding:0 32px;min-height:44px;box-sizing:border-box}
+@media (max-width:640px){.homebar .homelink{padding:0 12px}}
+@media print{.homebar{display:none}}
 </style>
 </head>
 <body>
+<nav class="homebar" aria-label="처음으로"><a class="homelink" href="./index.html">‹ CHAGOK 처음으로</a></nav>
 
 <header class="top">
-  <a class="homelink" href="./index.html">‹ CHAGOK 처음으로</a>
   <div class="hero">
     <div class="brand">
       <span class="eyebrow">동탄국제고 · 자습 배분표</span>
