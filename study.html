@@ -575,7 +575,7 @@ body.splashing .homebar,#gate:not(.hidden)~.homebar{display:none}
     </div>
     <div class="hidden" id="finalPanel"></div>
     <div class="hidden" id="realPanel"></div>
-    <p class="panelnote hidden" id="soonNote">모의고사(라이트·파이널·실전)는 시험 2주 전인 11월 24일에 열려요. 지엽은 학습지가 나오면 추가돼요.</p>
+    <p class="panelnote hidden" id="soonNote">지엽은 학습지가 나오면 추가돼요.</p>
       </div>
   <div class="group hidden" id="jyBox">
     <h2>지엽 범위 <span class="h2sub">여러 개 선택 가능</span></h2>
@@ -4857,7 +4857,7 @@ function setView(v){
 // ---- mock exams unlock two weeks before the final exam (Dec 8~11, 2026); uses the device date
 const UNLOCK=new Date(2026,10,24);
 let me=null;   // who is signed in on this device (set by the gate code at the end)
-const dateLocked=()=>!MID&&!MO10&&new Date()<UNLOCK;
+const dateLocked=()=>false;   // 11월 24일에 모의고사를 열었으므로 잠금 해제
 const examLocked=()=>dateLocked()&&!(me&&me.admin);   // 관리자는 해금 전에도 모의고사를 미리 볼 수 있다
 const examAvail=()=>MID||(!examLocked()&&EXQ.length>0);
 const finalAvail=()=>MID||(!examLocked()&&FINAL_SETS.length>0);
@@ -5181,7 +5181,7 @@ function applyLocks(){
     b.classList.toggle("locked",!ok);if(ok)b.removeAttribute("aria-disabled");else b.setAttribute("aria-disabled","true");
     sl.textContent=ok?b.dataset.sl:"🔒 "+b.dataset.sl;sv.textContent=ok?b.dataset.sv:lockText();
   });
-  $("soonNote").textContent=dateLocked()&&me&&me.admin?"👑 관리자 미리보기: 다른 사용자에게는 11월 24일까지 모의고사가 잠겨 있어요.":"모의고사(라이트·파이널·실전)는 시험 2주 전인 11월 24일에 열려요. 지엽은 학습지가 나오면 추가돼요.";
+  $("soonNote").textContent="지엽은 학습지가 나오면 추가돼요.";
 }
 applyLocks();
 renderHome();
@@ -6319,7 +6319,6 @@ const mkLocked=()=>typeof examLocked==="function"&&examLocked();
 const mkPreview=()=>typeof dateLocked==="function"&&dateLocked()&&!mkLocked();
 function mkPanel(){
   let h=`<div class="group" style="margin-top:22px"><h2>모의고사 <span class="h2sub">기말 구성 6문항 · 2학기 4 + 분배·교정 2</span></h2><p class="mknote">라이트로 감을 잡고, 파이널로 점검한 뒤, 실전으로 시험처럼 풀어 보세요.</p>`;
-  if(mkPreview())h+=`<p class="mknote">👑 관리자 미리보기: 다른 사용자에게는 11월 24일까지 잠겨 있어요.</p>`;
   h+=`<div class="mkcards">`;
   MK_SETS.forEach(S=>{const r=MKR[S.id],prog=mk&&mk.id===S.id&&!mk.done,lock=mkLocked();
     h+=`<div class="setcard${lock?" locked":""}"><div class="fc-t"><b>${S.name} ${S.no}회</b><span>${MK_Q[S.id].length}문항 · ${S.desc}</span></div><div class="fc-s">${lock?"🔒 "+(typeof lockText==="function"?lockText():"잠김"):r?`최근 <b>${r.last}점</b> · 최고 ${r.best}점 · ${r.n}번 응시`:"아직 응시하지 않았어요"}</div>${lock?"":`<button type="button" class="btn${prog?"":" ghost"}" data-mk="${S.id}">${prog?`이어서 풀기 (${mk.i+1}번부터)`:r?"다시 응시":"응시하기"}</button>`}</div>`});
